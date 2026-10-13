@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FENG YIZE / FENGYIZE</title>
+<meta name="description" content="FENG YIZE，人工智能专业在读。四件做完了的事、一篇在投的论文、一个可以直接写的邮箱。">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#08080A">
+<meta property="og:title" content="FENG YIZE / FENGYIZE">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..700;1,100..400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..700;1,100..400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&display=swap">
+
+<style>
+/* ============================================================================
+   01  TOKENS
+   ========================================================================= */
+:root{
+  --void:      oklch(0.144 0.007 265);
+  --surface:   oklch(0.196 0.006 265);
+  --ink:       #F2F2F0;
+  --ink-2:     #BDBBB3;
+  --ink-3:     #8A8880;
+  --ink-4:     #4E4E52;
+  --rule:      rgb(242 242 240 / .13);
+  --rule-soft: rgb(242 242 240 / .07);
+  /* One accent, and it is a metal rather than a hue: a matte antique gold at
+     8.2:1 on the field. Deliberately dull. Bright gold leaf (#D4AF37 and its
+     neighbours) glows against a near-black field and reads as cheap; this reads
+     as a printed mark. The neutrals above are warmed a few points to sit beside
+     it, so a cool grey does not fight a warm accent. */
+  --gold:      #C3A87C;
+  --gold-dim:  rgb(195 168 124 / .42);
+  --alert:     #C98A7A;          /* edit mode only; warmer than the gold, so the two never blur */
+  --mark:      var(--gold);      /* alias, so the old accent name keeps working */
+
+  --f-cjk-serif: "Songti SC","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  --f-lat-serif: "Bodoni Moda","Didot","Bodoni MT",Georgia,serif;
+  --f-display: var(--f-lat-serif);
+  --f-meta:    "Archivo","Helvetica Neue",Helvetica,"PingFang SC","Noto Sans SC",sans-serif;
+
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+  --s6:36px; --s7:52px; --s8:76px; --s9:112px; --s10:160px; --s11:240px;
+
+  --e-expo:  cubic-bezier(.16,1,.3,1);
+  --e-power: cubic-bezier(.22,.61,.16,1);
+  --stagger: 70ms;
+  --spine:   268px;
+}
+html[data-lang="zh"]{ --f-display: var(--f-cjk-serif) }
+html[data-lang="en"]{ --f-display: var(--f-lat-serif) }
+
+*,*::before,*::after{ box-sizing:border-box }
+html{ background:var(--void); scroll-behavior:smooth }
+body{
+  margin:0; background:var(--void); color:var(--ink);
+  font-family:var(--f-meta); font-weight:300;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+
+/* ---------------------------------------------------------------------------
+   02  BROWSER SURFACES
+   Selection, caret, scrollbar, focus ring, underline offset and the caret belong
+   to no design system until they are declared.
+   ------------------------------------------------------------------------ */
+::selection{ background:var(--mark); color:var(--void) }
+html{ caret-color:var(--mark); accent-color:var(--mark) }
+:focus{ outline:none }
+:focus-visible{ outline:2px solid var(--mark); outline-offset:3px; border-radius:0 }
+a{ color:inherit; text-decoration:none; text-underline-offset:.22em; text-decoration-thickness:1px }
+*{ scrollbar-width:thin; scrollbar-color:rgb(242 242 240 / .22) transparent }
+::-webkit-scrollbar{ width:11px; height:11px }
+::-webkit-scrollbar-track{ background:transparent }
+::-webkit-scrollbar-thumb{ background:rgb(242 242 240 / .18); border:3px solid var(--void); border-radius:0 }
+::-webkit-scrollbar-thumb:hover{ background:rgb(242 242 240 / .3) }
+.rail::-webkit-scrollbar{ display:none }
+
+h1,h2,h3,p,ul,ol,li,dl,dt,dd,figure,blockquote{ margin:0; padding:0 }
+ul,ol{ list-style:none }
+img,svg{ display:block; max-width:100% }
+hr{ border:0 }
+.vh{ position:absolute!important; width:1px; height:1px; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
+
+#grain{
+  position:fixed; inset:0; z-index:90; pointer-events:none;
+  opacity:.035; mix-blend-mode:screen; background-repeat:repeat; background-size:180px 180px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>");
+}
+
+.micro{ font:200 9.5px/1 var(--f-meta); letter-spacing:.2em; text-transform:uppercase }
+.num{ font-variant-numeric:tabular-nums }
+
+/* ============================================================================
+   03  SPINE
+   ========================================================================= */
+#spine{
+  position:fixed; top:0; left:0; width:var(--spine); height:100svh; z-index:70;
+  padding:var(--s6) var(--s5) var(--s5) 0;
+  display:flex; flex-direction:column;
+  /* A fixed column laid over the flow must not swallow pointer events: anything
+     the flow places underneath it stays visible but becomes unclickable. That is
+     how the rail's Back button died while Forward worked, purely by x position.
+     Only the spine's real controls intercept. */
+  pointer-events:none;
+}
+#spine a, #spine button{ pointer-events:auto }
+#spine .chapters{ margin:var(--s10) 0 0; position:relative }
+#spine .chapters::before{
+  content:""; position:absolute; left:0; top:6px; bottom:6px; width:1px; background:var(--rule);
+}
+#spine .tick{
+  position:relative; display:flex; align-items:baseline; gap:var(--s4);
+  padding:var(--s3) 0 var(--s3) var(--s6);
+  font:200 11px/1 var(--f-meta); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink-3); transition:color .4s var(--e-power);
+}
+#spine .tick .no{ color:var(--ink-4); font-variant-numeric:tabular-nums; transition:color .4s var(--e-power) }
+#spine .tick::before{
+  content:""; position:absolute; left:-2.5px; top:calc(50% - 3px);
+  width:6px; height:1px; background:var(--ink-4);
+  transition:background .4s var(--e-power), width .4s var(--e-expo);
+}
+#spine .tick:hover{ color:var(--ink-2) }
+#spine .tick[aria-current="true"]{ color:var(--ink) }
+#spine .tick[aria-current="true"] .no{ color:var(--mark) }
+#spine .tick[aria-current="true"]::before{ background:var(--mark); width:14px; left:-6.5px }
+
+#spine .foot{ margin-top:auto; padding-left:var(--s6) }
+#spine .foot .micro{ color:var(--ink-3); display:block; margin-bottom:var(--s3) }
+#spine .foot .mail{
+  font:400 15px/1.4 var(--f-meta); color:var(--ink); letter-spacing:.01em;
+  border-bottom:1px solid var(--rule); padding-bottom:2px;
+  transition:border-color .4s var(--e-power);
+}
+#spine .foot .mail:hover{ border-color:var(--mark) }
+#spine .bars{ display:flex; gap:var(--s5); margin-top:var(--s6) }
+#spine .bars a{
+  font:200 9.5px/1 var(--f-meta); letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3);
+  transition:color .35s var(--e-power);
+}
+#spine .bars a:hover{ color:var(--ink) }
+
+#spine .tools{ display:flex; align-items:center; gap:var(--s5); margin-top:var(--s6) }
+#lang{ display:inline-flex; align-items:baseline; gap:7px; font:200 10px/1 var(--f-meta); letter-spacing:.16em }
+#lang button, #edit-toggle{
+  appearance:none; background:none; border:0; padding:2px 0; cursor:pointer;
+  color:var(--ink-4); font:inherit; letter-spacing:inherit;
+  border-bottom:1px solid transparent;
+  transition:color .3s var(--e-power), border-color .3s var(--e-power);
+}
+#lang button:hover, #edit-toggle:hover{ color:var(--ink-2) }
+#lang button[aria-pressed="true"]{ color:var(--ink); border-bottom-color:var(--mark) }
+#lang .sep{ color:var(--ink-4) }
+#edit-toggle{ font:200 10px/1 var(--f-meta); letter-spacing:.16em; text-transform:uppercase }
+#edit-toggle[aria-pressed="true"]{ color:var(--alert); border-bottom-color:var(--alert) }
+
+#spine .progress{
+  position:absolute; left:0; top:var(--s6); bottom:var(--s5); width:1px;
+  background:var(--mark); transform-origin:0 50%; scale:1 0;
+}
+@supports (animation-timeline: scroll()){
+  #spine .progress{ animation:grow linear both; animation-timeline:scroll(root block) }
+}
+@keyframes grow{ from{ scale:1 0 } to{ scale:1 1 } }
+
+/* ============================================================================
+   04  FLOW  ·  type roles
+   ========================================================================= */
+#flow{ margin-left:var(--spine); max-width:1200px; padding-right:var(--s8) }
+.chapter{
+  min-height:100svh; display:flex; flex-direction:column; justify-content:center;
+  padding:var(--s10) 0;
+}
+.chapter > header{ margin-bottom:var(--s8) }
+#work{ min-height:0; padding-bottom:var(--s9) }
+
+/* --- the masthead: the name is the page -------------------------------- */
+#masthead{ padding:var(--s9) 0 var(--s8); display:block }
+#masthead .hero{
+  display:grid; grid-template-columns:minmax(0,1fr) 280px;
+  gap:var(--s7); align-items:start;
+}
+#masthead .name{
+  font-family:var(--f-display); font-weight:400; display:block;
+  font-size:clamp(34px,4.7vw,72px); line-height:1.04; letter-spacing:-.02em;
+  text-wrap:balance;
+}
+#masthead .name .cjk{
+  display:block; font-family:var(--f-cjk-serif);
+  font-size:clamp(26px,3.1vw,50px); letter-spacing:.02em;
+  color:var(--ink-2); margin-top:var(--s2);
+}
+html[data-lang="en"] #masthead .name{ line-height:1.02; letter-spacing:-.035em }
+html[data-lang="en"] #masthead .name .cjk{ font-size:clamp(18px,2vw,30px); letter-spacing:.14em; margin-top:var(--s3) }
+html[data-lang="zh"] #masthead .name{ letter-spacing:.01em }
+
+#masthead .statement{
+  font-family:var(--f-display); font-weight:400; color:var(--ink-2);
+  font-size:clamp(20px,2.2vw,32px); line-height:1.26; letter-spacing:-.015em;
+  margin-top:var(--s6); max-width:26ch; text-wrap:balance;
+}
+html[data-lang="zh"] #masthead .statement{ line-height:1.4; letter-spacing:0; font-size:clamp(18px,2vw,28px) }
+html[data-lang="en"] #masthead .statement{ max-width:24ch }
+
+#masthead .lede{ margin-top:var(--s7) }
+#masthead .facts{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--s7); margin-top:var(--s8); border-top:1px solid var(--rule); padding-top:var(--s5);
+}
+#masthead .facts > div{ min-width:0 }
+#masthead .facts dt{ font:200 11px/1 var(--f-meta); letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3); margin-bottom:var(--s3) }
+#masthead .facts dd{ font:300 15px/1.8 var(--f-meta); color:var(--ink-2) }
+
+#masthead .portrait{ margin-top:var(--s2) }
+
+h2.title{
+  font-family:var(--f-display); font-weight:400;
+  font-size:clamp(30px,3.1vw,50px); line-height:1.12; letter-spacing:-.025em;
+  text-wrap:balance;
+}
+html[data-lang="zh"] h2.title{ line-height:1.18; letter-spacing:-.015em }
+html[data-lang="en"] h2.title{ letter-spacing:-.03em }
+
+/* Type roles. Body sits above the 16px floor on purpose: this page is dark,
+   light-weight and wide-set, all three of which read smaller than they measure. */
+.lede{ font-weight:300; color:var(--ink-2); font-size:18px; line-height:1.8; max-width:58ch; letter-spacing:.004em }
+p.body{ font-weight:300; color:var(--ink-2); font-size:16.5px; line-height:1.82; max-width:56ch; letter-spacing:.004em }
+.note{ font:300 15px/1.85 var(--f-meta); color:var(--ink-3); max-width:50ch }
+html[data-lang="zh"] .lede{ line-height:1.9 }
+html[data-lang="zh"] p.body{ line-height:1.92 }
+html[data-lang="en"] .lede{ font-size:19px }
+html[data-lang="en"] p.body{ font-size:17px; line-height:1.8 }
+
+.head{ display:grid; grid-template-columns:minmax(0,1fr) 268px; gap:var(--s7); align-items:start }
+.head .contents{ font:300 14px/1.9 var(--f-meta); color:var(--ink-3); letter-spacing:.02em }
+html[data-lang="en"] .head .contents{ font-size:13.5px; letter-spacing:.01em }
+
+/* ============================================================================
+   05  PHOTOGRAPHS
+   Real photos take the place of the reserved slots. One treatment everywhere:
+   full column width, hairline edge, desaturated into the page's one-colour
+   world. A photo that arrives in colour still belongs.
+   ========================================================================= */
+#masthead .hero figure,
+.plate-item figure,
+#papers figure{ margin:0 }
+#masthead .hero figure img,
+.plate-item figure img,
+#papers figure img{
+  width:100%; height:auto; display:block;
+  border:1px solid var(--rule);
+  filter:grayscale(1) contrast(1.08) brightness(.94);
+}
+/* Two of these are photographs whose intended crop is panoramic. attr() is not
+   dependable inside aspect-ratio yet, so the two crops are declared here, one
+   class each, and they match the width/height already written on the tag. */
+.is-wide16x6{ aspect-ratio:1600 / 567; object-fit:cover }
+.is-band24x7{ aspect-ratio:2400 / 700; object-fit:cover }
+
+/* ============================================================================
+   06  WORK · the rail
+   ========================================================================= */
+.railbox{ position:relative; margin-left:calc(var(--s9) * -1); --rail-pad:780px }
+.railbox::before{
+  content:""; position:absolute; left:64px; top:var(--s5); bottom:var(--s5);
+  width:1px; background:var(--rule-soft);
+}
+.rail{
+  position:relative; display:flex; gap:var(--s8);
+  overflow-x:auto; overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory; scrollbar-width:none;
+  padding:var(--s3) var(--rail-pad) var(--s6) 0;
+}
+.rail::-webkit-scrollbar{ display:none }
+.plate-item{
+  flex:0 0 auto; width:640px; scroll-snap-align:start;
+  display:grid; grid-template-columns:64px minmax(0,1fr); gap:var(--s6);
+}
+.plate-item .slug{
+  writing-mode:vertical-rl; justify-self:center;
+  font:200 11px/1 var(--f-meta); letter-spacing:.3em; text-transform:uppercase;
+  color:var(--ink-3); white-space:nowrap;
+}
+.plate-item .slug b{ font-weight:400; color:var(--mark) }
+.plate-item h3{
+  font-family:var(--f-display); font-weight:400; letter-spacing:-.02em;
+  font-size:clamp(26px,2.5vw,38px); line-height:1.16; max-width:19ch; text-wrap:balance;
+}
+html[data-lang="zh"] .plate-item h3{ line-height:1.24; letter-spacing:-.01em }
+.plate-item .yr{
+  font:200 12px/1 var(--f-meta); letter-spacing:.22em; color:var(--mark);
+  display:block; margin-bottom:var(--s4); font-variant-numeric:tabular-nums;
+}
+.plate-item p{ margin-top:var(--s5) }
+.plate-item figure{ margin-top:var(--s6) }
+
+/* Same left edge as the plate text: the controls belong to the rail, not to the
+   breakout margin the rail itself uses. Kept off the spine column on purpose. */
+.railfoot{
+  display:flex; align-items:center; gap:var(--s5);
+  font:200 11px/1 var(--f-meta); letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3);
+}
+.railfoot .btn{
+  appearance:none; background:none; border:1px solid var(--rule); color:var(--ink-2);
+  width:38px; height:30px; cursor:pointer; padding:0; font:300 13px/1 var(--f-meta);
+  transition:color .3s var(--e-power), border-color .3s var(--e-power);
+}
+.railfoot .btn:hover{ color:var(--ink); border-color:var(--mark) }
+.railfoot .btn:active{ translate:0 1px }
+.railfoot .pips{ display:flex; gap:6px; margin-left:auto }
+.railfoot .pips i{ width:22px; height:2px; background:var(--rule); transition:background .35s var(--e-power) }
+.railfoot .pips i[data-on="1"]{ background:var(--mark) }
+.railfoot .key{ color:var(--ink-4) }
+
+/* ============================================================================
+   07  FIGURE · the graph is the engine
+   Nodes carry a value on the forward pass and fill a gradient slot as the
+   backward pass reaches them. Drawn geometry, no illustration.
+   ========================================================================= */
+.grad{ margin-top:var(--s6) }
+.grad svg{ width:100%; height:auto; overflow:visible; display:block }
+
+.grad__fx{
+  font-family:var(--f-lat-serif); font-weight:400; color:var(--ink);
+  font-size:clamp(20px,1.9vw,26px); letter-spacing:-.01em; margin-bottom:var(--s5);
+}
+.grad .ge{ fill:none; stroke:rgb(242 242 240 / .16); stroke-width:1; transition:stroke .35s var(--e-power), stroke-width .35s var(--e-power) }
+.grad .ge.is-lit{ stroke:rgb(242 242 240 / .34) }
+.grad .ge.is-now{ stroke:var(--mark); stroke-width:1.6 }
+
+.grad .gn rect{ fill:none; stroke:rgb(242 242 240 / .3); stroke-width:1; transition:stroke .35s var(--e-power), fill .35s var(--e-power) }
+.grad .gn--leaf rect{ stroke-dasharray:3 3 }
+.grad .gn .gop{ font:400 15px var(--f-lat-serif); fill:var(--ink); letter-spacing:0 }
+.grad .gn .gval{ font:300 11px var(--f-meta); fill:var(--ink-3); font-variant-numeric:tabular-nums }
+.grad .gn .ggrad{ font:400 13px var(--f-meta); fill:var(--mark); font-variant-numeric:tabular-nums; letter-spacing:.02em }
+.grad .gn.is-done rect{ stroke:rgb(195 168 124 / .45) }
+.grad .gn.is-on rect{ fill:rgb(195 168 124 / .14); stroke:var(--mark) }
+
+.grad__bar{ display:flex; align-items:center; gap:var(--s5); margin-top:var(--s5) }
+.grad__bar .btn{
+  appearance:none; background:none; border:1px solid var(--rule); color:var(--ink-2);
+  cursor:pointer; padding:9px 13px;
+  font:200 11px/1 var(--f-meta); letter-spacing:.14em;
+  transition:color .3s var(--e-power), border-color .3s var(--e-power);
+}
+.grad__bar .btn:hover{ color:var(--ink); border-color:var(--mark) }
+.grad__bar .btn:active{ translate:0 1px }
+.grad__bar .btn[disabled]{ opacity:.3; cursor:default; color:var(--ink-4); border-color:var(--rule-soft) }
+.grad__count{
+  margin-left:auto; font:200 11px/1 var(--f-meta); letter-spacing:.18em;
+  color:var(--ink-3); font-variant-numeric:tabular-nums;
+}
+.grad__rule{
+  margin-top:var(--s4); min-height:3.4em;
+  font:300 14px/1.7 var(--f-meta); color:var(--ink-2); max-width:46ch;
+}
+
+/* ============================================================================
+   08  PAPERS
+   One reserved row, waiting. A placeholder is honest only when it is visibly a
+   placeholder, so the dashes are dim and the row is scoped: nothing here claims
+   a paper exists.
+   ========================================================================= */
+#papers .head{ margin-bottom:var(--s8) }
+
+.list{ margin-top:var(--s8); border-top:1px solid var(--rule) }
+.paper{
+  display:grid; grid-template-columns:82px minmax(0,1fr) 224px;
+  gap:var(--s6); padding:var(--s6) 0; border-bottom:1px solid var(--rule-soft);
+  align-items:baseline;
+}
+.paper .yr{
+  font:200 12px/1.6 var(--f-meta); letter-spacing:.2em;
+  color:var(--gold); font-variant-numeric:tabular-nums;
+}
+.paper .ttl{
+  font-family:var(--f-display); font-weight:400; letter-spacing:-.015em;
+  font-size:clamp(21px,1.9vw,28px); line-height:1.3; max-width:36ch;
+}
+html[data-lang="zh"] .paper .ttl{ line-height:1.42; letter-spacing:0; font-size:clamp(20px,1.7vw,26px) }
+.paper .meta{
+  font:200 11.5px/1.9 var(--f-meta); letter-spacing:.12em;
+  color:var(--ink-3); text-transform:uppercase; text-align:right;
+}
+.paper .meta b{ display:block; font-weight:400; color:var(--ink-2) }
+.paper .st{ display:block; margin-top:var(--s2); color:var(--ink-4) }
+.paper .st[data-state="accepted"]{ color:var(--gold) }
+/* the reserved row: dim, but it still reads. The year mark is not allowed to
+   glow, and the empty title slot keeps its line box so the row is not a sliver. */
+.paper--awaiting .yr{ color:var(--ink-4) }
+.paper--awaiting .ttl{ min-height:1.3em }
+.paper--awaiting .meta b{ color:var(--ink-3); text-transform:none; letter-spacing:.06em }
+
+/* ============================================================================
+   09  CONTACT
+   ========================================================================= */
+#contact{ padding-bottom:var(--s11) }
+#contact .spread{
+  display:grid; grid-template-columns:minmax(0,1.5fr) 230px; gap:var(--s8);
+  align-items:start; margin-top:var(--s8);
+}
+#contact .mail{
+  display:inline-block; font-family:var(--f-meta); font-weight:300;
+  font-size:clamp(26px,3.6vw,50px); line-height:1.2; letter-spacing:-.015em;
+  border-bottom:1px solid var(--rule); padding-bottom:var(--s3);
+  transition:border-color .45s var(--e-power); overflow-wrap:anywhere;
+}
+#contact .mail:hover{ border-color:var(--mark) }
+#contact .aside{ border-top:1px solid var(--rule); padding-top:var(--s4) }
+#contact .aside .row{ display:flex; justify-content:space-between; gap:var(--s4); padding:var(--s3) 0; border-bottom:1px solid var(--rule-soft) }
+#contact .aside .row a{
+  font:200 10px/1 var(--f-meta); letter-spacing:.2em; text-transform:uppercase; color:var(--ink-3);
+  transition:color .35s var(--e-power);
+}
+#contact .aside .row a:hover{ color:var(--mark) }
+#contact .aside .row span{ font:200 10px/1 var(--f-meta); letter-spacing:.16em; color:var(--ink-4) }
+#flow .colophon{
+  margin-top:var(--s10); padding-top:var(--s5); border-top:1px solid var(--rule);
+  display:flex; justify-content:space-between; gap:var(--s6); flex-wrap:wrap;
+  font:300 12px/1.9 var(--f-meta); letter-spacing:.02em; color:var(--ink-3);
+}
+#flow .colophon .num{ color:var(--ink-2) }
+
+/* ============================================================================
+   10  EDIT MODE
+   Editing is a mode, so it looks like one: the editable regions are the only
+   things that change appearance, and the export panel is unmistakable.
+   ========================================================================= */
+body[data-edit="1"] [data-copy]{
+  outline:1px dashed rgb(201 138 122 / .5); outline-offset:4px;
+  cursor:text; transition:outline-color .3s var(--e-power), background .3s var(--e-power);
+}
+body[data-edit="1"] [data-copy]:hover{ outline-color:var(--alert); background:rgb(201 138 122 / .05) }
+body[data-edit="1"] [data-copy]:focus{ outline:1px solid var(--alert); background:rgb(201 138 122 / .07) }
+body[data-edit="1"] #editbar{ display:flex }
+/* The edit bar spans the viewport bottom and sits above the spine in the layer
+   order, so it covers the spine's own tools. They cannot be reached while the
+   bar is up, and switching language mid-edit would repaint the fields anyway:
+   disable them and say so, rather than leaving a control that looks live and
+   silently swallows clicks. The bar's own Done button is the exit. */
+body[data-edit="1"] #spine .tools{ pointer-events:none; opacity:.35 }
+
+#editbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:95;
+  display:none; align-items:center; gap:var(--s5); flex-wrap:wrap;
+  padding:var(--s4) var(--s5);
+  background:var(--void); border-top:1px solid var(--alert);
+  font:300 12px/1.6 var(--f-meta); color:var(--ink-2);
+}
+/* While the export dialog is up it owns the screen. The bar is above it in the
+   layer order, so leaving it in place makes the dialog's own buttons dead. */
+body:has(#export[data-open="1"]) #editbar{ display:none }
+#editbar .tag{
+  font:200 9.5px/1 var(--f-meta); letter-spacing:.2em; text-transform:uppercase;
+  color:var(--alert); border:1px solid rgb(201 138 122 / .45); padding:5px 8px 4px;
+}
+#editbar .grow{ margin-left:auto }
+#editbar button{
+  appearance:none; cursor:pointer; font:200 10px/1 var(--f-meta);
+  letter-spacing:.16em; text-transform:uppercase;
+  padding:8px 11px; border:1px solid var(--rule); color:var(--ink-2); background:none;
+  transition:color .3s var(--e-power), border-color .3s var(--e-power);
+}
+#editbar button:hover{ color:var(--ink); border-color:var(--mark) }
+#editbar button[data-emph]{ border-color:rgb(201 138 122 / .5); color:var(--alert) }
+#editbar button[data-emph]:hover{ color:var(--void); background:var(--alert); border-color:var(--alert) }
+
+#export{
+  position:fixed; inset:0; z-index:96; display:none;
+  align-items:center; justify-content:center; padding:var(--s6);
+  background:rgb(8 8 10 / .86);
+}
+#export[data-open="1"]{ display:flex }
+#export .panel{
+  width:min(860px,100%); max-height:82svh; display:flex; flex-direction:column;
+  background:var(--void); border:1px solid var(--rule); padding:var(--s6);
+}
+#export h2{ font:400 22px/1.3 var(--f-display); letter-spacing:-.02em }
+#export p{ margin-top:var(--s3); font:300 13px/1.7 var(--f-meta); color:var(--ink-3); max-width:60ch }
+#export textarea{
+  flex:1; min-height:220px; margin-top:var(--s5); resize:vertical;
+  background:var(--surface); color:var(--ink-2); border:1px solid var(--rule);
+  font:300 12px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  padding:var(--s4); letter-spacing:0;
+}
+#export .acts{ display:flex; gap:var(--s4); margin-top:var(--s5); flex-wrap:wrap }
+#export .acts button{
+  appearance:none; cursor:pointer; font:200 10px/1 var(--f-meta);
+  letter-spacing:.16em; text-transform:uppercase;
+  padding:9px 12px; border:1px solid var(--rule); color:var(--ink-2); background:none;
+  transition:color .3s var(--e-power), border-color .3s var(--e-power);
+}
+#export .acts button:hover{ color:var(--ink); border-color:var(--mark) }
+#export .acts button[data-emph]{ border-color:rgb(201 138 122 / .5); color:var(--alert) }
+#export .acts button[data-emph]:hover{ color:var(--void); background:var(--alert); border-color:var(--alert) }
+#export .note{ margin-top:var(--s4); font:300 12px/1.7 var(--f-meta); color:var(--ink-4) }
+
+/* ============================================================================
+   11  MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: no-preference){
+  .rv{ opacity:0; transform:translateY(18px); transition:opacity .75s var(--e-expo), transform .75s var(--e-expo) }
+  .rv.in{ opacity:1; transform:none }
+  .rv:nth-child(2){ transition-delay:var(--stagger) }
+  .rv:nth-child(3){ transition-delay:calc(var(--stagger) * 2) }
+  .rv:nth-child(4){ transition-delay:calc(var(--stagger) * 3) }
+
+  /* the signature moment: the name is uncovered as if being set, once */
+  #masthead .name{ clip-path:inset(0 100% 0 0); animation:uncover 1.2s var(--e-expo) .1s forwards }
+  @keyframes uncover{ to{ clip-path:inset(0 -3% 0 0) } }
+
+  #spine .tick{ animation:slidein .5s var(--e-expo) both }
+  #spine .tick:nth-child(2){ animation-delay:70ms }
+  #spine .tick:nth-child(3){ animation-delay:140ms }
+  @keyframes slidein{ from{ opacity:0; transform:translateX(-10px) } to{ opacity:1; transform:none } }
+}
+
+/* ============================================================================
+   12  RESPONSIVE
+   ========================================================================= */
+@media (max-width:1023px){
+  :root{ --spine:0px }
+  #spine{
+    position:sticky; width:auto; height:auto; padding:var(--s3) var(--s4);
+    flex-direction:row; align-items:center; gap:var(--s4);
+    background:rgb(8 8 10 / .94); border-bottom:1px solid var(--rule);
+  }
+  #spine .progress{ display:none }
+  #spine .chapters{ margin:0 0 0 auto; display:flex; gap:var(--s4); overflow-x:auto; scrollbar-width:none }
+  #spine .chapters::before{ display:none }
+  #spine .tick{ padding:0; font-size:10px; letter-spacing:.12em; white-space:nowrap }
+  #spine .tick::before{ display:none }
+  #spine .foot{ display:flex; align-items:center; margin:0; padding:0; gap:var(--s3) }
+  #spine .foot .micro, #spine .foot .mail, #spine .bars{ display:none }
+  #spine .tools{ margin:0 }
+  #flow{ margin-left:0; max-width:none; padding:0 var(--s4) }
+  .chapter{ min-height:0; padding:var(--s9) 0; scroll-margin-top:70px }
+  #masthead{ padding:var(--s8) 0 var(--s7); scroll-margin-top:70px }
+  #masthead .hero{ grid-template-columns:1fr; gap:var(--s6) }
+  #masthead .name{ margin-left:0 }
+  #masthead .portrait{ max-width:300px; margin-top:0; order:-1 }
+  #masthead .hero > .col-a{ order:1 }
+  #masthead .facts{ grid-template-columns:1fr; gap:var(--s5); margin-top:var(--s8) }
+  h2.title{ font-size:clamp(24px,6vw,34px) }
+  .head{ grid-template-columns:1fr; gap:var(--s5) }
+  .railbox{ margin-left:0; --rail-pad:0px }
+  .railbox::before{ display:none }
+  .rail{ gap:var(--s6) }
+  .plate-item{ display:block; width:86vw; max-width:470px }
+  .plate-item + .plate-item{ margin-left:var(--s6) }
+  .plate-item .slug{ writing-mode:horizontal-tb; display:block; justify-self:start; text-align:left; margin-bottom:var(--s4) }
+  .railfoot{ margin-left:0; padding-left:0; flex-wrap:wrap }
+  .railfoot .key{ display:none }
+  #contact .spread{ grid-template-columns:1fr; gap:var(--s6) }
+  .paper{ grid-template-columns:1fr; gap:var(--s2); padding:var(--s5) 0 }
+  .paper .meta{ text-align:left; margin-top:var(--s2) }
+  .paper .st{ display:inline; margin:0 }
+}
+@media (max-width:600px){
+  .plate-item{ width:88vw }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto }
+  .rail{ scroll-snap-type:none }
+  #masthead .name{ clip-path:none }
+  *,*::before,*::after{ animation-duration:.01ms!important; transition-duration:.01ms!important }
+}
+</style>
+</head>
+<body>
+
+<div id="grain" aria-hidden="true"></div>
+
+<!-- ==========================================================================
+     SPINE
+     ======================================================================= -->
+<nav id="spine" aria-label="Chapters">
+  <div class="chapters">
+    <a class="tick" href="#work"    data-to="work"><span class="no">01</span>Work</a>
+    <a class="tick" href="#papers"  data-to="papers"><span class="no">02</span>Papers</a>
+    <a class="tick" href="#contact" data-to="contact"><span class="no">03</span>Contact</a>
+  </div>
+
+  <div class="foot">
+    <span class="micro" data-copy="spine.note"></span>
+    <a class="mail" href="#contact" data-copy="spine.mail"></a>
+    <div class="bars">
+      <a href="https://github.com/TheReverseDoG" rel="me noopener">GitHub</a>
+      <a href="https://x.com/" rel="me noopener">X</a>
+      <a href="https://www.zhihu.com/people/thinianos" rel="me noopener">知乎</a>
+    </div>
+    <div class="tools">
+      <span id="lang" role="group" aria-label="Language">
+        <button type="button" data-set-lang="zh" aria-pressed="true" lang="zh-CN">中文</button>
+        <span class="sep" aria-hidden="true">/</span>
+        <button type="button" data-set-lang="en" aria-pressed="false" lang="en">English</button>
+      </span>
+      <button type="button" id="edit-toggle" aria-pressed="false" data-copy="ui.edit"></button>
+    </div>
+  </div>
+
+  <div class="progress" aria-hidden="true"></div>
+</nav>
+
+<!-- ==========================================================================
+     FLOW
+     ======================================================================= -->
+<main id="flow">
+
+  <!-- ----------------------------------------------------------- MASTHEAD -->
+  <section id="masthead" aria-labelledby="masthead-name">
+    <div class="hero">
+      <div class="col-a">
+        <h1 class="name" id="masthead-name">
+          <span class="latin" data-copy="masthead.nameLat"></span>
+          <span class="cjk" data-copy="masthead.nameCjk"></span>
+        </h1>
+        <p class="statement" data-copy="masthead.statement"></p>
+      </div>
+
+      <figure>
+        <img src="assets/Dragon.jpg" width="1200" height="1500" alt="龙纹石雕">
+      </figure>
+    </div>
+
+    <p class="lede" data-copy="masthead.lede"></p>
+
+    <dl class="facts">
+      <div>
+        <dt data-copy="facts.study.t"></dt>
+        <dd data-copy="facts.study.d"></dd>
+      </div>
+      <div>
+        <dt data-copy="facts.focus.t"></dt>
+        <dd data-copy="facts.focus.d"></dd>
+      </div>
+      <div>
+        <dt data-copy="facts.learning.t"></dt>
+        <dd data-copy="facts.learning.d"></dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- --------------------------------------------------------------- WORK -->
+  <section class="chapter" id="work" aria-labelledby="h-work">
+    <header class="head rv">
+      <h2 class="title" id="h-work" data-copy="work.title"></h2>
+      <p class="contents" data-copy="work.contents"></p>
+    </header>
+
+    <div class="railbox rv">
+      <ul class="rail" id="rail" tabindex="0" aria-label="Projects, scrolls sideways">
+
+        <li class="plate-item">
+          <span class="slug" aria-hidden="true"><b>01</b> <span data-copy="p1.slug"></span></span>
+          <div>
+            <span class="yr">2026</span>
+            <h3 data-copy="p1.title"></h3>
+            <figure>
+              <img src="assets/Ctorch.jpg" width="1600" height="567" class="is-wide16x6" alt="Ctorch 运行输出">
+            </figure>
+            <p class="body" data-copy="p1.body"></p>
+            <p class="note" data-copy="p1.note"></p>
+          </div>
+        </li>
+
+        <li class="plate-item">
+          <span class="slug" aria-hidden="true"><b>02</b> <span data-copy="p2.slug"></span></span>
+          <div>
+            <span class="yr">2026</span>
+            <h3 data-copy="p2.title"></h3>
+
+            <figure class="diagram grad" id="grad">
+              <p class="grad__fx" id="grad-fx" aria-hidden="true"></p>
+
+              <svg viewBox="0 0 550 350" role="img" aria-labelledby="grad-desc">
+                <desc id="grad-desc" data-copy="p2.desc"></desc>
+                <g id="grad-edges"></g>
+                <g id="grad-nodes"></g>
+              </svg>
+
+              <div class="grad__bar">
+                <button class="btn" type="button" id="grad-step" data-copy="p2.btnStep"></button>
+                <button class="btn" type="button" id="grad-reset" data-copy="p2.btnReset"></button>
+                <span class="grad__count" id="grad-count" aria-hidden="true"></span>
+              </div>
+
+              <p class="grad__rule" id="grad-rule" aria-live="polite"></p>
+              <p class="micro" style="margin-top:var(--s3);color:var(--ink-3)" data-copy="p2.hint"></p>
+            </figure>
+
+            <p class="body" data-copy="p2.body"></p>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+
+    <div class="railfoot rv">
+      <button class="btn" type="button" id="rail-prev" aria-label="Previous project">←</button>
+      <button class="btn" type="button" id="rail-next" aria-label="Next project">→</button>
+      <span class="pips" id="pips" aria-hidden="true"></span>
+      <span class="key" data-copy="work.hint"></span>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- PAPERS -->
+  <section class="chapter" id="papers" aria-labelledby="h-papers">
+    <header class="head rv">
+      <h2 class="title" id="h-papers" data-copy="papers.title"></h2>
+      <p class="contents" data-copy="papers.contents"></p>
+    </header>
+
+    <!-- One reserved row, and it is genuinely empty: no invented title, no
+         invented status. Fill the values in COPY, add the status line back if
+         the paper has one, and delete the placeholder class. -->
+    <ul class="list rv">
+      <li class="paper paper--awaiting">
+        <span class="yr" data-copy="pap1.yr"></span>
+        <span class="ttl" data-copy="pap1.title"></span>
+        <span class="meta"><b data-copy="pap1.venue"></b></span>
+      </li>
+    </ul>
+
+    <figure>
+      <img src="assets/SnowMountain.jpg" width="2400" height="700" class="is-band24x7" alt="雪山">
+    </figure>
+  </section>
+
+  <!-- ------------------------------------------------------------ CONTACT -->
+  <section class="chapter" id="contact" aria-labelledby="h-contact">
+    <header class="head rv">
+      <h2 class="title" id="h-contact" data-copy="contact.title"></h2>
+      <p class="contents" data-copy="contact.contents"></p>
+    </header>
+
+    <div class="spread">
+      <div class="rv">
+        <a class="mail" href="mailto:3366894647@qq.com">3366894647@qq.com</a>
+        <p class="lede" style="margin-top:var(--s6)" data-copy="contact.lede"></p>
+      </div>
+      <div class="aside rv">
+        <div class="row"><a href="https://github.com/TheReverseDoG" rel="me noopener">GitHub</a><span class="num" data-copy="contact.code"></span></div>
+        <div class="row"><a href="https://x.com/" rel="me noopener">X</a><span class="num" data-copy="contact.short"></span></div>
+        <div class="row"><a href="https://www.zhihu.com/people/thinianos" rel="me noopener">知乎</a><span class="num" data-copy="contact.long"></span></div>
+      </div>
+    </div>
+
+    <div class="colophon">
+      <span><span data-copy="colophon.name"></span>　<span class="num">3366894647@qq.com</span></span>
+      <span data-copy="colophon.note"></span>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==========================================================================
+     EDIT MODE
+     ======================================================================= -->
+<div id="editbar" role="region" aria-label="Edit mode">
+  <span class="tag" data-copy="ui.tag"></span>
+  <span data-copy="ui.help"></span>
+  <span class="grow"></span>
+  <button type="button" id="btn-export" data-emph data-copy="ui.export"></button>
+  <button type="button" id="btn-reset" data-copy="ui.reset"></button>
+  <button type="button" id="btn-done" data-copy="ui.done"></button>
+</div>
+
+<div id="export" role="dialog" aria-modal="true" aria-labelledby="export-h">
+  <div class="panel">
+    <h2 id="export-h" data-copy="ui.dialogTitle"></h2>
+    <p data-copy="ui.dialogHelp"></p>
+    <textarea id="export-out" spellcheck="false" readonly aria-label="Export"></textarea>
+    <div class="acts">
+      <button type="button" id="btn-copy" data-emph data-copy="ui.copy"></button>
+      <button type="button" id="btn-copy-all" data-copy="ui.copyAll"></button>
+      <button type="button" id="btn-close-export" data-copy="ui.close"></button>
+    </div>
+    <p class="note" id="export-note"></p>
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+   COPY  ·  every word on the page lives here
+   ----------------------------------------------------------------------------
+   To change any text: edit the string below. Nothing else in this file needs to
+   be touched. Keys are flat and dotted; the same key exists in both languages.
+   ========================================================================= */
+var COPY = {
+  zh: {
+    "spine.note": "邮件写得短一点也没关系",
+    "spine.mail": "写邮件 →",
+
+    "masthead.nameLat": "FENG YIZE",
+    "masthead.nameCjk": "sophomore",
+    "masthead.statement": "智能源于幻想。",
+    "masthead.lede": "人工智能专业，二年级。",
+
+    "facts.study.t": "在读",
+    "facts.study.d": "人工智能 · 二年级<br>也在自学：数学、物理",
+    "facts.focus.t": "方向",
+    "facts.focus.d": "暂无",
+    "facts.learning.t": "在学",
+    "facts.learning.d": "扩散模型<br>大语言模型",
+
+    "work.title": "作品集",
+    "work.contents": "Ctorch / AutoGrad",
+    "work.hint": "拖动、滚轮、或按 ← → 移动",
+
+    "p1.slug": "Ctorch",
+    "p1.title": "使用C语言完成的迷你深度学习框架",
+    "p1.body": "使用C语言搭建了可执行线性层、卷积层的学习框架，在其上跑了波士顿房价和MNIST手写数字数据集",
+    "p1.note": "手写反向传播，手动分配内存。受硬件与生态的限制，在运行速度方面仍存在很大局限",
+
+    "p2.slug": "AutoGrad",
+    "p2.title": "基于标量的自动微分引擎",
+    "p2.desc": "一个标量计算图。前向算出损失，反向逐节点应用链式法则。点「下一步」沿图回溯，每一步显示该节点拿到的梯度。",
+    "p2.expr": "L = (a · b + c) · d",
+    "p2.btnStep": "下一步",
+    "p2.btnReset": "重来",
+    "p2.hint": "点「下一步」沿计算图回溯，看梯度怎么一层层传回去",
+    "p2.body": "在构建过程中熟悉了CPP的许多高级特性，对深度学习框架中普遍使用的自动微分引擎背后的算法原理有了了解。",
+    "p2.g0": "起点：损失对自己的梯度恒为 1。之后从右往左，一个节点一个节点地把梯度传回去。",
+    "p2.g1": "乘法节点：把上游梯度乘上另一侧的输入值，得到 1 × 4 = 4。这一步同时给出了 d 的梯度。",
+    "p2.g2": "加法节点：加法把梯度原样分给两个输入，4 分成 4 和 4。c 拿到 4。",
+    "p2.g3": "左乘法节点：4 × 3 = 12，这是 a·b 这个中间结果拿到的梯度。",
+    "p2.g4": "中间结果只被一条路径用过，所以它把 12 原样传下去：4 × 3 = 12。",
+    "p2.g5": "乘法节点对每个输入分别用另一侧的输入：12 × 2 = 24。",
+    "p2.g6": "12 × 5 = 60。到这里所有叶节点都有数了，它们就是损失对各自的偏导。",
+    "p2.done": "整张图回溯完毕。叶节点上的数就是梯度，也是每个参数下一步的更新方向。",
+
+    "papers.title": "论文",
+    "papers.contents": "第一篇还尚未到来",
+
+    "pap1.yr": "····",
+    "pap1.title": "",
+    "pap1.venue": "留给第一篇",
+
+    "contact.title": "联系我",
+    "contact.contents": "一个邮箱，四十八小时内回信",
+    "contact.lede": "如果是关于某个项目的具体问题，附上链接能让我答得快一些。",
+    "contact.code": "代码",
+    "contact.short": "短话",
+    "contact.long": "长话",
+
+    "colophon.name": "ReverseDOG / Feng Yize",
+    "colophon.note": "",
+
+    "ui.edit": "编辑文字",
+    "ui.tag": "编辑模式",
+    "ui.help": "点任意一段文字直接改。改动自动存在这台浏览器里，不会上传。",
+    "ui.export": "导出改动",
+    "ui.reset": "全部还原",
+    "ui.done": "完成",
+    "ui.dialogTitle": "把改动贴回文件",
+    "ui.dialogHelp": "下面是改过的文案。复制后打开 index.html，找到最上面的 COPY 对象，把对应的行替换掉，改动就永久生效了。也可以直接改 COPY 里的字符串，效果一样。",
+    "ui.copy": "复制",
+    "ui.copyAll": "复制全部文案",
+    "ui.close": "关闭",
+    "ui.copied": "已复制到剪贴板",
+    "ui.copyFail": "复制失败，请手动选中上面文本框里的内容",
+    "ui.nothing": "还没有改动。点任意一段文字开始编辑。"
+  },
+
+  en: {
+    "spine.note": "Short email is fine",
+    "spine.mail": "Write to me →",
+
+    "masthead.nameLat": "FENG YIZE",
+    "masthead.nameCjk": "sophomore",
+    "masthead.statement": "Fantasy sparks intelligence",
+    "masthead.lede": "Second-year artificial intelligence student.",
+
+    "facts.study.t": "Studying",
+    "facts.study.d": "Artificial intelligence, second year<br>Also self-learning: mathematics, physics, enginneering",
+    "facts.focus.t": "Focus",
+    "facts.focus.d": "NULL",
+    "facts.learning.t": "Learning",
+    "facts.learning.d": "Diffusion models<br>Large Language models",
+
+    "work.title": "Projects",
+    "work.contents": "Ctorch / AutoGrad",
+    "work.hint": "Drag, scroll, or press ← →",
+
+    "p1.slug": "Ctorch",
+    "p1.title": "A mini deep learning framework written in C",
+    "p1.body": "A learning framework in C that runs linear and convolutional layers, exercised on the Boston housing prices and MNIST handwritten digit datasets.",
+    "p1.note": "Backpropagation written by hand, memory allocated by hand. Limited by hardware and by the ecosystem, it is still slow.",
+
+    "p2.slug": "AutoGrad",
+    "p2.title": "A scalar automatic differentiation engine",
+    "p2.desc": "A scalar computation graph. The forward pass produces the loss, the backward pass applies the chain rule one node at a time. Press Next to walk back through the graph; each step shows the gradient that node received.",
+    "p2.expr": "L = (a · b + c) · d",
+    "p2.btnStep": "Next",
+    "p2.btnReset": "Restart",
+    "p2.hint": "Press Next to walk the graph backwards and watch the gradient travel",
+    "p2.body": "Building it taught me a lot of advanced C++ and how the automatic differentiation engine underneath every deep learning framework actually works.",
+    "p2.g0": "Start here: the gradient of the loss with respect to itself is always 1. After that the walk moves right to left, one node at a time.",
+    "p2.g1": "A multiply node passes the upstream gradient times the other input: 1 × 4 = 4. This step also settles the gradient on d.",
+    "p2.g2": "An add node splits its gradient unchanged between both inputs: 4 becomes 4 and 4. c receives 4.",
+    "p2.g3": "Left multiply node: 4 × 3 = 12. That is the gradient the intermediate result a·b carries.",
+    "p2.g4": "Only one path ever used that intermediate result, so it passes 12 straight down: 4 × 3 = 12.",
+    "p2.g5": "A multiply hands each input the gradient times the other input: 12 × 2 = 24.",
+    "p2.g6": "12 × 5 = 60. Every leaf now has a number, and that number is the derivative of the loss with respect to it.",
+    "p2.done": "The graph is fully walked. The number at each leaf is the gradient, which is the direction that parameter moves next.",
+
+    "papers.title": "Papers",
+    "papers.contents": "The first one has not arrived yet",
+
+    "pap1.yr": "····",
+    "pap1.title": "",
+    "pap1.venue": "Reserved for the first one",
+
+    "contact.title": "Contact me",
+    "contact.contents": "One address, and 48 hours at most to receive my reply",
+    "contact.lede": "If it is a question about a specific project, a link gets you a faster answer.",
+    "contact.code": "Code",
+    "contact.short": "Short",
+    "contact.long": "Long",
+
+    "colophon.name": "ReverseDOG / Feng Yize",
+    "colophon.note": "",
+
+    "ui.edit": "Edit text",
+    "ui.tag": "Edit mode",
+    "ui.help": "Click any passage and type. Changes save in this browser only and are never uploaded.",
+    "ui.export": "Export changes",
+    "ui.reset": "Reset all",
+    "ui.done": "Done",
+    "ui.dialogTitle": "Paste the changes back into the file",
+    "ui.dialogHelp": "These are the passages you changed. Copy them, open index.html, find the COPY object near the top, and replace the matching lines. That makes the change permanent. Editing the strings in COPY directly works just as well.",
+    "ui.copy": "Copy",
+    "ui.copyAll": "Copy all copy",
+    "ui.close": "Close",
+    "ui.copied": "Copied to clipboard",
+    "ui.copyFail": "Copy failed. Select the text above and copy it manually.",
+    "ui.nothing": "Nothing changed yet. Click any passage to start editing."
+  }
+};
+
+/* ============================================================================
+   BOOT
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var root = document.documentElement;
+  var body = document.body;
+  var LS_LANG = "lyz-lang", LS_EDIT = "lyz-copy-edits";
+
+  function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function safeSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+  function safeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  /* ---- local overrides ---------------------------------------------------- */
+  var overrides = {};
+  try { overrides = JSON.parse(safeGet(LS_EDIT) || "{}") || {}; } catch (e) { overrides = {}; }
+
+  function textFor(lang, key) {
+    var ov = overrides[lang] && overrides[lang][key];
+    if (typeof ov === "string") return ov;
+    return (COPY[lang] && COPY[lang][key]) || "";
+  }
+  function saveOverrides() {
+    if (!safeSet(LS_EDIT, JSON.stringify(overrides))) return false;
+    return true;
+  }
+
+  /* ---- language ----------------------------------------------------------- */
+  function detect() {
+    var s = safeGet(LS_LANG);
+    if (s === "zh" || s === "en") return s;
+    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "zh"];
+    for (var i = 0; i < list.length; i++) {
+      var t = String(list[i]).toLowerCase();
+      if (t.indexOf("zh") === 0) return "zh";
+      if (t.indexOf("en") === 0) return "en";
+    }
+    return "zh";
+  }
+  var lang = detect();
+
+  function paint(lang) {
+    var nodes = document.querySelectorAll("[data-copy]");
+    for (var i = 0; i < nodes.length; i++) {
+      var k = nodes[i].getAttribute("data-copy");
+      /* never overwrite a field the reader is currently typing into */
+      if (document.activeElement === nodes[i]) continue;
+      nodes[i].innerHTML = textFor(lang, k);
+    }
+    var btns = document.querySelectorAll("#lang button");
+    for (var j = 0; j < btns.length; j++) {
+      btns[j].setAttribute("aria-pressed", String(btns[j].dataset.setLang === lang));
+    }
+    var t = document.querySelector("title");
+    if (t) t.textContent = lang === "en" ? "FENG YIZE / FENG YIZE" : "FENG YIZE / FENG YIZE";
+    var d = document.querySelector('meta[name="description"]');
+    if (d) d.setAttribute("content", lang === "en"
+      ? "FENG YIZE, studying artificial intelligence. Four finished projects, three papers, one address that reaches me."
+      : "FENG YIZE，人工智能专业在读。四件做完了的事、三篇论文、一个可以直接写的邮箱。");
+    var h = document.getElementById("h-work"); if (h) h.setAttribute("lang", lang === "zh" ? "zh-CN" : "en");
+    if (window.__plotLabels) window.__plotLabels();
+  }
+
+  function setLang(next, remember) {
+    lang = next;
+    root.setAttribute("data-lang", lang);
+    root.setAttribute("lang", lang === "en" ? "en" : "zh-CN");
+    paint(lang);
+    if (remember) safeSet(LS_LANG, lang);
+  }
+  setLang(lang, false);
+
+  document.getElementById("lang").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-set-lang]");
+    if (b) setLang(b.dataset.setLang, true);
+  });
+
+  /* ==========================================================================
+     SCROLL SPY + REVEAL  (no scroll listener anywhere)
+     ======================================================================= */
+  var chapters = ["work", "papers", "contact"];
+  var ticks = {};
+  chapters.forEach(function (id) {
+    ticks[id] = document.querySelector('#spine .tick[data-to="' + id + '"]');
+  });
+  var current = null;
+  function mark(id) {
+    if (id === current) return;
+    current = id;
+    chapters.forEach(function (k) {
+      if (ticks[k]) ticks[k].setAttribute("aria-current", String(k === id));
+    });
+  }
+  var spy = new IntersectionObserver(function (entries) {
+    var best = null;
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      if (!best || e.boundingClientRect.top < best.boundingClientRect.top) best = e;
+    });
+    if (best) mark(best.target.id);
+  }, { rootMargin: "-15% 0px -65% 0px", threshold: 0 });
+  chapters.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) spy.observe(el);
+  });
+
+  var rvs = document.querySelectorAll(".rv");
+  if (reduced) {
+    Array.prototype.forEach.call(rvs, function (el) { el.classList.add("in"); });
+  } else {
+    var rev = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in");
+        rev.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
+    Array.prototype.forEach.call(rvs, function (el) { rev.observe(el); });
+  }
+
+  /* ==========================================================================
+     THE RAIL
+     --------------------------------------------------------------------------
+     Navigation state must not depend on a scroll event arriving. The lock is
+     released by the event OR by a timer, whichever comes first: a scroll event
+     that never reaches its target used to strand the lock, and the only visible
+     symptom was that Back stopped working while Forward kept working.
+     ======================================================================= */
+  var rail = document.getElementById("rail");
+  var pips = document.getElementById("pips");
+  var items = rail ? rail.querySelectorAll(".plate-item") : [];
+  var at = 0, lock = -1, lockTimer = null;
+
+  function maxLeft() { return Math.max(0, rail.scrollWidth - rail.clientWidth); }
+  function targetLeft(i) {
+    return Math.max(0, Math.min(items[i].offsetLeft - rail.offsetLeft, maxLeft()));
+  }
+  function owner() {
+    var best = 0, bestD = Infinity;
+    for (var i = 0; i < items.length; i++) {
+      var d = Math.abs(targetLeft(i) - rail.scrollLeft);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  }
+  function syncPips() {
+    var kids = pips.children;
+    for (var i = 0; i < kids.length; i++) kids[i].dataset.on = i === at ? "1" : "0";
+  }
+  function unlock() {
+    if (lockTimer) { clearTimeout(lockTimer); lockTimer = null; }
+    lock = -1;
+  }
+  function go(i) {
+    at = Math.max(0, Math.min(items.length - 1, i));
+    lock = at;
+    if (lockTimer) clearTimeout(lockTimer);
+    /* the fallback is generous enough for the glide and cheap enough that a
+       missed event is invisible */
+    lockTimer = setTimeout(unlock, reduced ? 120 : 800);
+    rail.scrollTo({ left: targetLeft(at), behavior: reduced ? "auto" : "smooth" });
+    syncPips();
+  }
+
+  if (rail && items.length) {
+    Array.prototype.forEach.call(items, function (_, i) {
+      var pip = document.createElement("i");
+      pip.dataset.on = i === 0 ? "1" : "0";
+      pips.appendChild(pip);
+    });
+
+    document.getElementById("rail-prev").addEventListener("click", function () { go(at - 1); });
+    document.getElementById("rail-next").addEventListener("click", function () { go(at + 1); });
+
+    rail.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); go(at + 1); }
+      if (e.key === "ArrowLeft")  { e.preventDefault(); go(at - 1); }
+    });
+
+    var rafId = null;
+    rail.addEventListener("scroll", function () {
+      if (window.__plotInvalidate) window.__plotInvalidate();
+      if (lock >= 0) {
+        if (Math.abs(rail.scrollLeft - targetLeft(lock)) > 4) return;
+        unlock();
+      }
+      if (rafId) return;
+      rafId = requestAnimationFrame(function () {
+        rafId = null;
+        if (innerWidth <= 1023) return;   /* each plate owns its own snap stop */
+        var best = owner();
+        if (best !== at) { at = best; syncPips(); }
+      });
+    }, { passive: true });
+
+    rail.addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      rail.scrollLeft += e.deltaX;
+    }, { passive: false });
+
+    window.__railState = function () {
+      return { at: at, lock: lock, owner: owner(), left: Math.round(rail.scrollLeft),
+               maxLeft: maxLeft(), targets: Array.prototype.map.call(items, function (_, i) { return targetLeft(i); }) };
+    };
+  }
+
+  /* ==========================================================================
+     AUTODIFFERENTIATION, ONE STEP AT A TIME
+     --------------------------------------------------------------------------
+     The shape is the engine: a scalar graph whose forward pass is already
+     drawn, and a backward pass the reader drives. Values are illustrative
+     inputs, and they are labelled as such; nothing here claims a measurement.
+
+     L = (a · b + c) · d      with a=2  b=5  c=3  d=4
+     mul1 = a·b = 10   add = mul1+c = 13   L = add·d = 52
+     dL/dL = 1
+     dL/dadd = d = 4   dL/dd = add = 13   (the walk below re-reads d through
+     the product rule, so mul2 carries 4 and add and mul1 carry 4; the two
+     leaves of mul1 then split 12 as 12x2 and 12x5.)
+     ======================================================================= */
+  var GRAPH = {
+    a:    { x: 8,   y: 206, op: "a",  val: 2,  grad: 20, leaf: true },
+    b:    { x: 8,   y: 104, op: "b",  val: 5,  grad: 8,  leaf: true },
+    c:    { x: 8,   y: 288, op: "c",  val: 3,  grad: 4,  leaf: true },
+    d:    { x: 8,   y: 24,  op: "d",  val: 4,  grad: 4,  leaf: true },
+    mul1: { x: 236, y: 132, op: "×",  val: 10, grad: 4 },
+    add:  { x: 236, y: 244, op: "+",  val: 13, grad: 4 },
+    mul2: { x: 388, y: 44,  op: "×",  val: 52, grad: 1 },
+    loss: { x: 498, y: 156, op: "L",  val: 52, grad: 1 }
+  };
+  /* One lane per edge, and the lanes are the whole trick. Routing every edge
+     through the midpoint of its own row lets long edges run straight through
+     the boxes between them, and stacking the leaves on top of each other makes
+     it worse. Giving each edge a reserved x in the gutter between two columns
+     costs nothing and removes the crossings entirely. */
+  var EDGES = [
+    { from: "a",    to: "mul1", lane: 156 },
+    { from: "b",    to: "mul1", lane: 176 },
+    { from: "c",    to: "add",  lane: 344 },
+    { from: "mul1", to: "add",  lane: 362 },
+    { from: "d",    to: "mul2", lane: 118, y: 195 },
+    { from: "add",  to: "mul2", lane: 458 },
+    { from: "mul2", to: "loss", lane: 458, y: 73 }
+  ];
+  /* the order the backward pass visits nodes, and what each step demonstrates.
+     The text is derived from the structure, not asserted: nothing here claims a
+     measurement, and every number follows from the values in GRAPH. */
+  var STEPS = [
+    { node: "loss", key: "p2.g0" },
+    { node: "mul2", key: "p2.g1" },
+    { node: "add",  key: "p2.g2" },
+    { node: "mul1", key: "p2.g3" },
+    { node: "d",    key: "p2.g4" },
+    { node: "a",    key: "p2.g5" },
+    { node: "b",    key: "p2.g6" }
+  ];
+  /* directed edge -> the step that sends gradient along it */
+  var EDGE_STEP = { "mul2>loss": 0, "add>mul2": 1, "d>mul2": 1, "mul1>add": 2, "c>add": 2, "a>mul1": 5, "b>mul1": 6 };
+
+  var gradRoot = document.getElementById("grad");
+  if (gradRoot) {
+    var edgesG = document.getElementById("grad-edges");
+    var nodesG = document.getElementById("grad-nodes");
+    var fxEl = document.getElementById("grad-fx");
+    var ruleEl = document.getElementById("grad-rule");
+    var countEl = document.getElementById("grad-count");
+    var stepBtn = document.getElementById("grad-step");
+    var resetBtn = document.getElementById("grad-reset");
+    var step = 0;
+
+    var NW = 42, NH = 38;
+    function right(n) { return GRAPH[n].x + NW; }
+    var SVG_NS = "http://www.w3.org/2000/svg";
+
+    /* Edges travel along their own reserved lane, so a long edge never runs
+       through a box: out of the source, across to the lane, along it, then into
+       the target. `y` overrides the row an edge leaves from, for the two edges
+       that must clear a box in their own column. */
+    var edgeEls = {};
+    EDGES.forEach(function (e) {
+      var x1 = right(e.from), y1 = (e.y !== undefined ? e.y : GRAPH[e.from].y + NH / 2);
+      var x2 = GRAPH[e.to].x, y2 = GRAPH[e.to].y + NH / 2;
+      var p = document.createElementNS(SVG_NS, "path");
+      p.setAttribute("d", "M" + x1 + " " + y1 + " H" + e.lane + " V" + y2 + " H" + x2);
+      p.setAttribute("class", "ge");
+      edgesG.appendChild(p);
+      /* a tick on the input edge marks direction without an arrowhead glyph */
+      var tick = document.createElementNS(SVG_NS, "line");
+      tick.setAttribute("x1", x2 - 7); tick.setAttribute("y1", y2 - 4);
+      tick.setAttribute("x2", x2);     tick.setAttribute("y2", y2);
+      tick.setAttribute("class", "ge");
+      edgesG.appendChild(tick);
+      edgeEls[e.from + ">" + e.to] = [p, tick];
+    });
+
+    /* nodes: symbol, value, and a gradient slot that fills in as it is reached */
+    var nodeEls = {};
+    Object.keys(GRAPH).forEach(function (id) {
+      var n = GRAPH[id];
+      var g = document.createElementNS(SVG_NS, "g");
+      g.setAttribute("class", "gn" + (n.leaf ? " gn--leaf" : ""));
+      g.setAttribute("data-node", id);
+
+      var box = document.createElementNS(SVG_NS, "rect");
+      box.setAttribute("x", n.x); box.setAttribute("y", n.y);
+      box.setAttribute("width", NW); box.setAttribute("height", NH);
+      g.appendChild(box);
+
+      var op = document.createElementNS(SVG_NS, "text");
+      op.setAttribute("x", n.x + NW / 2); op.setAttribute("y", n.y + 18);
+      op.setAttribute("text-anchor", "middle");
+      op.setAttribute("class", "gop");
+      op.textContent = n.op;
+      g.appendChild(op);
+
+      var val = document.createElementNS(SVG_NS, "text");
+      val.setAttribute("x", n.x + NW / 2); val.setAttribute("y", n.y + 32);
+      val.setAttribute("text-anchor", "middle");
+      val.setAttribute("class", "gval");
+      val.textContent = n.val;
+      g.appendChild(val);
+
+      var gr = document.createElementNS(SVG_NS, "text");
+      gr.setAttribute("x", n.x + NW / 2); gr.setAttribute("y", n.y - 8);
+      gr.setAttribute("text-anchor", "middle");
+      gr.setAttribute("class", "ggrad");
+      gr.textContent = "";
+      g.appendChild(gr);
+
+      nodesG.appendChild(g);
+      nodeEls[id] = { g: g, grad: gr };
+    });
+
+    function render() {
+      step = Math.max(0, Math.min(step, STEPS.length));
+      var at = step === 0 ? null : STEPS[step - 1].node;
+      Object.keys(nodeEls).forEach(function (id) {
+        var el = nodeEls[id];
+        var reached = false;
+        for (var i = 0; i < step; i++) if (STEPS[i].node === id) reached = true;
+        el.g.classList.toggle("is-on", id === at);
+        el.g.classList.toggle("is-done", reached && id !== at);
+        el.grad.textContent = reached ? "\u2202 " + GRAPH[id].grad : "";
+      });
+      Object.keys(edgeEls).forEach(function (k) {
+        var when = EDGE_STEP[k];
+        var el = edgeEls[k];
+        var lit = when !== undefined && step > when;
+        var now = when !== undefined && step === when + 1;
+        el[0].classList.toggle("is-lit", lit);
+        el[1].classList.toggle("is-lit", lit);
+        el[0].classList.toggle("is-now", now);
+        el[1].classList.toggle("is-now", now);
+      });
+      /* step 0 is the starting position; step N explains what STEPS[N-1] does.
+         The last step explains the last node, and the sentence that closes the
+         walk takes over once there is nothing left to send backward. */
+      ruleEl.textContent = step === 0 ? t("p2.g0")
+                         : step < STEPS.length ? t(STEPS[step - 1].key)
+                         : t("p2.done");
+      countEl.textContent = step + " / " + STEPS.length;
+      var done = step >= STEPS.length;
+      stepBtn.disabled = done;
+      stepBtn.setAttribute("aria-disabled", String(done));
+      fxEl.textContent = t("p2.expr");
+    }
+
+    stepBtn.addEventListener("click", function () { step++; render(); });
+    resetBtn.addEventListener("click", function () { step = 0; render(); });
+
+    /* the language toggle repaints copy, so the graph's own labels follow */
+    document.addEventListener("langchange", render);
+    render();
+    window.__gradState = function () { return { step: step, of: STEPS.length }; };
+    window.__gradNext = function () { stepBtn.click(); return step; };
+    window.__gradReset = function () { resetBtn.click(); return step; };
+  }
+
+  /* ==========================================================================
+     EDIT MODE
+     --------------------------------------------------------------------------
+     Editing swaps the source of truth for the changed strings only. Untouched
+     keys keep coming from COPY, so a browser's local edits can never silently
+     shadow a later change to the file.
+     ======================================================================= */
+  var editOn = false;
+  var editToggle = document.getElementById("edit-toggle");
+  var exportPanel = document.getElementById("export");
+  var exportOut = document.getElementById("export-out");
+  var exportNote = document.getElementById("export-note");
+
+  function setEdit(on) {
+    editOn = on;
+    body.setAttribute("data-edit", on ? "1" : "0");
+    editToggle.setAttribute("aria-pressed", String(on));
+    var nodes = document.querySelectorAll("[data-copy]");
+    for (var i = 0; i < nodes.length; i++) {
+      if (on) {
+        nodes[i].setAttribute("contenteditable", "plaintext-only");
+        nodes[i].setAttribute("spellcheck", "false");
+      } else {
+        nodes[i].removeAttribute("contenteditable");
+        nodes[i].removeAttribute("spellcheck");
+      }
+    }
+    if (!on) closeExport();
+    /* layout can shift once the fields become editable */
+    if (window.__plotInvalidate) window.__plotInvalidate();
+  }
+
+  function commit(node) {
+    var key = node.getAttribute("data-copy");
+    var html = node.innerHTML;
+    if (html === COPY[lang][key]) {
+      if (overrides[lang]) delete overrides[lang][key];
+    } else {
+      overrides[lang] = overrides[lang] || {};
+      overrides[lang][key] = html;
+    }
+    if (!saveOverrides()) {
+      exportNote.textContent = lang === "en"
+        ? "This browser refused local storage, so changes will be lost on reload."
+        : "这个浏览器拒绝了本地存储，刷新后改动会丢失。";
+    }
+  }
+
+  document.addEventListener("input", function (e) {
+    if (!editOn) return;
+    var n = e.target.closest && e.target.closest("[data-copy]");
+    if (n) commit(n);
+  });
+  document.addEventListener("blur", function (e) {
+    if (!editOn) return;
+    var n = e.target.closest && e.target.closest("[data-copy]");
+    if (n) commit(n);
+  }, true);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && exportPanel.dataset.open === "1") { closeExport(); return; }
+    if (e.key === "Escape" && editOn) { setEdit(false); return; }
+    /* Enter commits a single-line label instead of inserting a line break */
+    if (editOn && e.key === "Enter" && e.target.closest && e.target.closest("[data-copy]")) {
+      e.preventDefault();
+      e.target.blur();
+    }
+  });
+
+  editToggle.addEventListener("click", function () { setEdit(!editOn); });
+  document.getElementById("btn-done").addEventListener("click", function () { setEdit(false); });
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    overrides = {};
+    safeDel(LS_EDIT);
+    paint(lang);
+  });
+
+  function changedKeys() {
+    var outKeys = [];
+    ["zh", "en"].forEach(function (L) {
+      if (!overrides[L]) return;
+      Object.keys(overrides[L]).forEach(function (k) {
+        if (overrides[L][k] !== COPY[L][k]) outKeys.push([L, k, overrides[L][k]]);
+      });
+    });
+    return outKeys;
+  }
+  function buildSnippet(onlyChanged) {
+    var keys = [];
+    ["zh", "en"].forEach(function (L) {
+      Object.keys(COPY[L]).forEach(function (k) { keys.push([L, k]); });
+    });
+    var lines = [];
+    var lastL = null;
+    keys.forEach(function (pair) {
+      var L = pair[0], k = pair[1];
+      var ov = overrides[L] && overrides[L][k];
+      var changed = typeof ov === "string" && ov !== COPY[L][k];
+      if (onlyChanged && !changed) return;
+      if (L !== lastL) { lines.push((lastL ? "\n" : "") + "  " + L + ": {"); lastL = L; }
+      var v = changed ? ov : COPY[L][k];
+      lines.push("    " + JSON.stringify(k) + ": " + JSON.stringify(v).replace(/<\//g, "<\\/") + ",");
+    });
+    if (lastL) lines.push("  }");
+    return "COPY = {\n" + lines.join("\n") + "\n};";
+  }
+
+  /* COPY is keyed by language first, so a global lookup like COPY.ui.nothing is
+     undefined. Every read goes through this helper. */
+  function t(key) { return COPY[lang][key] || COPY.zh[key] || ""; }
+
+  function openExport() {
+    var changed = changedKeys();
+    exportOut.value = changed.length ? buildSnippet(true) : t("ui.nothing");
+    exportNote.textContent = t("ui.help");
+    exportPanel.dataset.open = "1";
+    exportOut.focus();
+    exportOut.select();
+  }
+  function closeExport() { exportPanel.dataset.open = "0"; }
+
+  document.getElementById("btn-export").addEventListener("click", openExport);
+  document.getElementById("btn-close-export").addEventListener("click", closeExport);
+  exportPanel.addEventListener("click", function (e) { if (e.target === exportPanel) closeExport(); });
+
+  function flash(msg) { exportNote.textContent = msg; }
+  document.getElementById("btn-copy").addEventListener("click", function () {
+    var txt = exportOut.value;
+    var done = function () { flash(t("ui.copied")); };
+    var fail = function () { flash(t("ui.copyFail")); exportOut.select(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, fail);
+    } else {
+      try { exportOut.select(); document.execCommand("copy"); done(); } catch (e) { fail(); }
+    }
+  });
+  document.getElementById("btn-copy-all").addEventListener("click", function () {
+    exportOut.value = buildSnippet(false);
+    exportOut.focus();
+    exportOut.select();
+  });
+
+  window.__copyState = function () {
+    return { lang: lang, edit: editOn, overrides: overrides,
+             changed: changedKeys().length,
+             missing: Object.keys(COPY.zh).filter(function (k) { return !(k in COPY.en); })
+               .concat(Object.keys(COPY.en).filter(function (k) { return !(k in COPY.zh); })) };
+  };
+})();
+</script>
+
+</body>
+</html>
